@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Durham College GPA Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            width: 60%;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Durham College GPA Calculator (5.0 Scale)</h2>
+
+    <table id="gpaTable">
+        <tr>
+            <th>Numeric Grade (0-100)</th>
+            <th>Credit Hours</th>
+        </tr>
+        <tr>
+            <td><input type="number" name="numeric_grade" min="0" max="100" required></td>
+            <td><input type="number" name="credits" min="1" required></td>
+        </tr>
+    </table>
+
+    <button onclick="addRow()">Add Course</button>
+    <button onclick="calculateGPA()">Calculate GPA</button>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        // Durham College 5.0 GPA Scale
+        const gradeScale = [
+            { min: 90, max: 100, gpa: 5.0 },
+            { min: 85, max: 89, gpa: 4.5 },
+            { min: 80, max: 84, gpa: 4.0 },
+            { min: 75, max: 79, gpa: 3.5 },
+            { min: 70, max: 74, gpa: 3.0 },
+            { min: 65, max: 69, gpa: 2.5 },
+            { min: 60, max: 64, gpa: 2.0 },
+            { min: 55, max: 59, gpa: 1.5 },
+            { min: 50, max: 54, gpa: 1.0 },
+            { min: 0, max: 49, gpa: 0.0 }
+        ];
+
+        function addRow() {
+            let table = document.getElementById("gpaTable");
+            let row = table.insertRow(-1);
+            row.innerHTML = '<td><input type="number" name="numeric_grade" min="0" max="100" required></td><td><input type="number" name="credits" min="1" required></td>';
+        }
+
+        function convertToGPA(numericGrade) {
+            for (let range of gradeScale) {
+                if (numericGrade >= range.min && numericGrade <= range.max) {
+                    return range.gpa;
+                }
+            }
+            return 0.0; // Default in case of an invalid input
+        }
+
+        function calculateGPA() {
+            let rows = document.querySelectorAll("#gpaTable tr");
+            let totalCredits = 0;
+            let totalPoints = 0;
+
+            for (let i = 1; i < rows.length; i++) {
+                let numGradeInput = rows[i].cells[0].querySelector("input");
+                let creditInput = rows[i].cells[1].querySelector("input");
+
+                let numGrade = parseFloat(numGradeInput.value);
+                let credits = parseFloat(creditInput.value);
+
+                if (!isNaN(numGrade) && !isNaN(credits) && credits > 0) {
+                    let gpa = convertToGPA(numGrade);
+                    totalCredits += credits;
+                    totalPoints += gpa * credits;
+                }
+            }
+
+            let finalGPA = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "N/A";
+            document.getElementById("result").innerHTML = `<strong>Your GPA: ${finalGPA}</strong>`;
+        }
+    </script>
+
+</body>
+</html>
